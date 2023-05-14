@@ -13,7 +13,8 @@ public class UserInterface extends FlashcardManager {
     }
 
     public void start() throws IOException {
-        while (true) {
+        boolean isRunning = true;
+        while (isRunning) {
             System.out.println("Input the action (add, remove, import, export, ask, exit):");
             String userInput = scanner.nextLine();
 
@@ -25,10 +26,17 @@ public class UserInterface extends FlashcardManager {
                     this.flashcardManager.removeFlashcard(scanner);
                 }
                 case "import" -> {
-
+                    this.flashcardManager.importFile(scanner);
                 }
                 case "export" -> {
                     this.flashcardManager.exportFile(scanner);
+                }
+                case "ask" -> {
+                    this.flashcardManager.askCardsByUser(scanner);
+                }
+                case "exit" -> {
+                    System.out.println("Bye bye!");
+                    isRunning = false;
                 }
             }
         }
