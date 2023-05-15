@@ -1,7 +1,11 @@
 package flashcards;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class UserInterface extends FlashcardManager {
     private FlashcardManager flashcardManager;
@@ -15,10 +19,8 @@ public class UserInterface extends FlashcardManager {
     public void start() throws IOException {
         boolean isRunning = true;
         while (isRunning) {
-            System.out.println("Input the action (add, remove, import, export, ask, exit):");
-            String userInput = scanner.nextLine();
 
-            switch (userInput) {
+            switch (this.flashcardManager.askUser(scanner)) {
                 case "add" -> {
                     this.flashcardManager.userAddFlashCard(scanner);
                 }
@@ -38,7 +40,17 @@ public class UserInterface extends FlashcardManager {
                     System.out.println("Bye bye!");
                     isRunning = false;
                 }
+                case "log" -> {
+                    this.flashcardManager.saveLog(scanner);
+                }
+                case "hardest card" -> {
+                    this.flashcardManager.hardestCard();
+                }
+                case "reset stats" -> {
+                    this.flashcardManager.resetStats();
+                }
             }
         }
     }
+
 }
