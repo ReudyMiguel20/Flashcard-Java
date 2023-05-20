@@ -91,7 +91,7 @@ public class FlashcardManager {
     }
 
     public void userAddFlashCard(Scanner scanner) {
-        System.out.println("The card:");
+        System.out.println("\nThe card:");
         this.log.add("The card:");
         String term = scanner.nextLine();
 
@@ -110,7 +110,7 @@ public class FlashcardManager {
         this.log.add(answer);
 
         this.flashcardDeck.add(new Flashcard(term, answer));
-        System.out.println("The pair (\"" + term + "\":\"" + answer + "\") has been added.");
+        System.out.println("The pair (\"" + term + "\":\"" + answer + "\") has been added.\n");
         this.log.add("The pair (\"" + term + "\":\"" + answer + "\") has been added.");
     }
 
@@ -163,18 +163,19 @@ public class FlashcardManager {
             } else {
                 for (int j = 0; j <= cardsQuantity; j++) {
                     if (j == cardsQuantity) {
-                        System.out.println("Wrong. The right answer is \"" + this.flashcardDeck.get(i).getAnswer() + "\"");
+                        System.out.println("Wrong. The right answer is \"" + this.flashcardDeck.get(i).getAnswer() + "\".");
                         this.log.add("Wrong. The right answer is \"" + this.flashcardDeck.get(i).getAnswer() + "\"");
                         int mistakeNumber = this.flashcardDeck.get(i).getNumberMistakes();
                         this.flashcardDeck.get(i).setNumberMistakes(mistakeNumber + 1);
                     } else if (this.flashcardDeck.get(j).getAnswer().equals(answer)) {
-                        System.out.println("Wrong. The right answer is \"" + this.flashcardDeck.get(i).getAnswer() + "\"," + " but your definition is correct for \"" + this.flashcardDeck.get(j).getTerm() + "\".");
-                        this.log.add("Wrong. The right answer is \"" + this.flashcardDeck.get(i).getAnswer() + "\"," + " but your definition is correct for \"" + this.flashcardDeck.get(j).getTerm() + "\".");
+                        System.out.printf("Wrong. The right answer is \"%s\" but your definition is correct for \"%s\".", this.flashcardDeck.get(i).getAnswer(), this.flashcardDeck.get(j).getTerm());
+                        this.log.add("Wrong. The right answer is \"" + this.flashcardDeck.get(i).getAnswer() + "\"," + " but your definition is correct for \"" + this.flashcardDeck.get(j).getTerm() + "\"" + ".");
                         int mistakeNumber = this.flashcardDeck.get(i).getNumberMistakes();
                         this.flashcardDeck.get(i).setNumberMistakes(mistakeNumber + 1);
                         break;
                     }
                 }
+                System.out.println();
 
             }
         }
@@ -207,19 +208,29 @@ public class FlashcardManager {
         //Also counting the cards, this will affect the way it prints the message.
         StringBuilder sb = new StringBuilder();
         String mostMistakesCard = "";
-        int testNumberOfMistakes = 0;
+        int cardWithMostMistakes = 0;
         int numberOfMistakes = 0;
         int numberOfCards = 0;
+        boolean onlyACardWithMostMistake = true;
 
-        //What I want to do is to put first the biggest term with the most number of mistakes on the sb
+//        What I want to do is to put first the biggest term with the most number of mistakes on the sb
         for (int x = 0; x < this.flashcardDeck.size(); x++) {
             if (this.flashcardDeck.get(x).getNumberMistakes() >= 1) {
-                testNumberOfMistakes = this.flashcardDeck.get(x).getNumberMistakes();
+                numberOfMistakes = this.flashcardDeck.get(x).getNumberMistakes();
                 mostMistakesCard = this.flashcardDeck.get(x).getTerm();
+
+                //Here im determining if there's only one card with most mistakes, if there is not then it's going to
+                //print both names of both cards at the end with the number of mistakes.
+                if (cardWithMostMistakes < this.flashcardDeck.get(x).getNumberMistakes()) {
+                    cardWithMostMistakes = this.flashcardDeck.get(x).getNumberMistakes();
+                } else if (cardWithMostMistakes == this.flashcardDeck.get(x).getNumberMistakes()) {
+                    onlyACardWithMostMistake = false;
+                }
             }
         }
+//
+//        sb.append("\"").append(mostMistakesCard).append("\"");
 
-        sb.append("\"").append(mostMistakesCard).append("\"");
 
         //This is for grabbing the names of the cards with 1 or more mistakes, then summing the tries and printing them out
         for (int i = 0; i < this.flashcardDeck.size(); i++) {
@@ -228,11 +239,12 @@ public class FlashcardManager {
                     numberOfMistakes = this.flashcardDeck.get(i).getNumberMistakes();
                 }
 //                numberOfMistakes += this.flashcardDeck.get(i).getNumberMistakes();
-//                sb.append("\"").append(this.flashcardDeck.get(i).getTerm()).append("\"").append(".");
-                sb.append(".");
+                sb.append("\"").append(this.flashcardDeck.get(i).getTerm()).append("\"");
                 numberOfCards++;
             } else if (this.flashcardDeck.get(i).getNumberMistakes() >= 1) {
                 if (sb.toString().contains(this.flashcardDeck.get(i).getTerm())) {
+                    continue;
+                } else if (onlyACardWithMostMistake) {
                     continue;
                 }
 
@@ -240,26 +252,31 @@ public class FlashcardManager {
                     numberOfMistakes = this.flashcardDeck.get(i).getNumberMistakes();
                 }
 //                numberOfMistakes += this.flashcardDeck.get(i).getNumberMistakes();
-                sb.append(", ").append("\"").append(this.flashcardDeck.get(i).getTerm()).append("\"");
+                sb.append("\"").append(this.flashcardDeck.get(i).getTerm()).append("\"").append(", ");
                 numberOfCards++;
             }
         }
 
         //Printing the result depending on the number of cards
         if (numberOfCards > 1) {
-            System.out.println("The hardest cards are " + sb.toString() + " You have " + numberOfMistakes + " errors answering them.\n");
-            this.log.add("The hardest cards are " + sb.toString() + " You have " + numberOfMistakes + " errors answering them.");
+            if (onlyACardWithMostMistake) {
+                System.out.println("The hardest card is " + sb.toString() + ". You have " + numberOfMistakes + " errors answering it.\n");
+                this.log.add("The hardest card is " + sb.toString() + ". You have " + numberOfMistakes + " errors answering it.");
+            } else {
+                System.out.println("The hardest cards are " + sb.toString() + ". You have " + numberOfMistakes + " errors answering them.\n");
+                this.log.add("The hardest cards is " + sb.toString() + ". You have " + numberOfMistakes + " errors answering them.");
+            }
         } else if (numberOfCards == 1) {
             if (numberOfMistakes == 1) {
-                System.out.println("The hardest card is " + sb.toString() + " You have " + numberOfMistakes + " error answering it.\n");
-                this.log.add("The hardest card is " + sb.toString() + " You have " + numberOfMistakes + " error answering it.");
+                System.out.println("The hardest card is " + sb.toString() + ". You have " + numberOfMistakes + " error answering it.\n");
+                this.log.add("The hardest card is " + sb.toString() + ". You have " + numberOfMistakes + " errors answering it.");
             } else {
-                System.out.println("The hardest card is " + sb.toString() + " You have " + numberOfMistakes + " errors answering it.\n");
-                this.log.add("The hardest card is " + sb.toString() + " You have " + numberOfMistakes + " errors answering it.");
+                System.out.println("The hardest card is " + sb.toString() + ". You have " + numberOfMistakes + " errors answering it.\n");
+                this.log.add("The hardest card is " + sb.toString() + ". You have " + numberOfMistakes + " errors answering it.");
             }
         } else {
-            System.out.println("There are no cards with errors.");
-            this.log.add("There are no cards with errors.");
+            System.out.println("There are no cards with errors.\n");
+            this.log.add("There are no cards with errors.\n");
         }
 
 
@@ -324,7 +341,8 @@ public class FlashcardManager {
                     }
                 }
             }
-            System.out.println(counter + " cards have been loaded.");
+            reader.close();
+            System.out.println(counter + " cards have been loaded.\n");
             this.log.add(counter + " cards have been loaded.");
         } catch (FileNotFoundException e) {
             System.out.println("File not found.");
